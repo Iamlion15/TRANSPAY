@@ -11,4 +11,4 @@ const matchPassword = async (password, entered_password) => {
     return match;
 }
 
-module.exports={hashPassword,matchPassword};
+module.exports = { hashPassword, matchPassword };
