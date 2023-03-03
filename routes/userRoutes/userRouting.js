@@ -1,8 +1,9 @@
 const router=require("express").Router();
 const userModel=require("../../model/userModel");
 const passwordUtil=require("../../Helpers/hash_match_password");
+const Validation=require("../../middlewares/userValidation");
 
-router.post("/signup",async(req,res)=>{
+router.post("/signup",Validation.checkEmail,Validation.checkPhoneNumber,async(req,res)=>{
     const firstname=req.body.fname;
     const lastname=req.body.lname;
     const email=req.body.email;
