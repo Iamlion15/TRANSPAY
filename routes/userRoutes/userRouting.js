@@ -4,6 +4,8 @@ const passwordUtil = require("../../Helpers/hash_match_password");
 const Validation = require("../../middlewares/userValidation");
 const checkCredentials = require("../../Helpers/checkCredentials");
 const generateToken = require("../../Helpers/tokenGenerator");
+const checkAuth=require("../../middlewares/checkAuthentication");
+const uploadProfile=require("../../middlewares/UploadProfilePic");
 
 router.post("/signup", Validation.checkEmail, Validation.checkPhoneNumber, async (req, res) => {
     const firstname = req.body.fname;
@@ -38,6 +40,44 @@ router.post("/login", async (req, res) => {
         res.status(200).json({ "message": "password not matching phone number" })
     }
 
+})
+
+router.post("/uploadProfile",checkAuth,uploadProfile,async(req,res)=>{
+    try {
+        const phone=req.user;
+        const data=await userModel.findOne({phoneNumber:phone})
+        data.profilePic.path=req.file.path;
+        const upload=await userModel.findOneAndUpdate(data._id,data);
+        res.json({"message":"uploaded image successfully"})
+    } catch (error) {
+        res.status(200).json({ "message": "unable to upload image" })
+    }
+})
+
+router.get("/getidentification",checkAuth,async(req,res)=>{
+    try
+    {
+        const phone=req.user;
+        const user=await userModel.findOne({phoneNumber:phone})
+        res.status(200).json({"id":user._id});
+    }
+    catch(error)
+    {
+        res.status(200).json({"message":"can not find user"})
+    }
+})
+
+router.get("/getprofilepicture",checkAuth,async(req,res)=>{
+    try
+    {
+        const phone=req.user;
+        const user=await userModel.findOne({phoneNumber:phone})
+        res.status(200).sendFile(user.profilePic.path);
+    }
+    catch(error)
+    {
+        res.status(200).json({"message":"can not profile oicture"})
+    }
 })
 
 module.exports = router;
