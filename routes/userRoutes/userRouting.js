@@ -4,8 +4,9 @@ const passwordUtil = require("../../Helpers/hash_match_password");
 const Validation = require("../../middlewares/userValidation");
 const checkCredentials = require("../../Helpers/checkCredentials");
 const generateToken = require("../../Helpers/tokenGenerator");
-const checkAuth=require("../../middlewares/checkAuthentication");
-const uploadProfile=require("../../middlewares/UploadProfilePic");
+const checkAuth = require("../../middlewares/checkAuthentication");
+const uploadProfile = require("../../middlewares/UploadProfilePic");
+const uploadCloudinary = require("../../middlewares/cloudinarySetting");
 
 router.post("/signup", Validation.checkEmail, Validation.checkPhoneNumber, async (req, res) => {
     const firstname = req.body.fname;
@@ -42,41 +43,38 @@ router.post("/login", async (req, res) => {
 
 })
 
-router.post("/uploadProfile",checkAuth,uploadProfile,async(req,res)=>{
+router.post("/uploadProfile", checkAuth, uploadProfile, async (req, res) => {
     try {
-        const phone=req.user;
-        const data=await userModel.findOne({phoneNumber:phone})
-        data.profilePic.path=req.file.path;
-        const upload=await userModel.findOneAndUpdate(data._id,data);
-        res.json({"message":"uploaded image successfully"})
+        const phone = req.user;
+        const data = await userModel.findOne({ phoneNumber: phone })
+        const result = await uploadCloudinary(req.file.path);
+        data.profilePic.path = result.secure_url;
+        const upload = await userModel.findOneAndUpdate(data._id, data);
+        res.json({ "message": "saved image successfully" });
     } catch (error) {
-        res.status(200).json({ "message": "unable to upload image" })
+        res.status(200).json({ "message": error.message })
     }
 })
 
-router.get("/getidentification",checkAuth,async(req,res)=>{
-    try
-    {
-        const phone=req.user;
-        const user=await userModel.findOne({phoneNumber:phone})
-        res.status(200).json({"id":user._id});
+router.get("/getidentification", checkAuth, async (req, res) => {
+    try {
+        const phone = req.user;
+        const user = await userModel.findOne({ phoneNumber: phone })
+        res.status(200).json({ "id": user._id });
     }
-    catch(error)
-    {
-        res.status(200).json({"message":"can not find user"})
+    catch (error) {
+        res.status(200).json({ "message": "can not find user" })
     }
 })
 
-router.get("/getprofilepicture",checkAuth,async(req,res)=>{
-    try
-    {
-        const phone=req.user;
-        const user=await userModel.findOne({phoneNumber:phone})
+router.get("/getprofilepicture", checkAuth, async (req, res) => {
+    try {
+        const phone = req.user;
+        const user = await userModel.findOne({ phoneNumber: phone })
         res.status(200).sendFile(user.profilePic.path);
     }
-    catch(error)
-    {
-        res.status(200).json({"message":"can not profile oicture"})
+    catch (error) {
+        res.status(200).json({ "message": "can not profile oicture" })
     }
 })
 

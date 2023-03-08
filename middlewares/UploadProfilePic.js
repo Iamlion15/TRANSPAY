@@ -1,14 +1,10 @@
-const multer=require("multer")
-const userModel=require("../model/userModel");
-const path=require("path");
+const multer = require("multer")
+const path = require("path");
 
-const destination =multer.diskStorage({
-    destination:(req,file,cb)=>{
-        cb(null,path.join(path.dirname(__dirname),"/upload/profilepicture"));
-    },
-    filename:(req,file,cb)=>{
-        const imageExtension=file.mimetype.split("/")[1];
-        cb(null,`profile-${Date.now()}.${imageExtension}`);
+
+const destination = multer.diskStorage({
+    filename: (req, file, cb) => {
+        cb(null, `${file.originalname}`);
     }
 })
 
@@ -21,11 +17,10 @@ const isImage = (req, file, callback) => {
     }
 }
 
-const upload=multer({
+const upload = multer({
 
-    storage:destination,
-    fileFilter:isImage
+    storage: destination,
+    fileFilter: isImage
 })
 
-
-module.exports=upload.single();
+module.exports = upload.single();
