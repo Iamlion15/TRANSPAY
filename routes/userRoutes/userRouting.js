@@ -7,6 +7,7 @@ const generateToken = require("../../Helpers/tokenGenerator");
 const checkAuth = require("../../middlewares/checkAuthentication");
 const uploadProfile = require("../../middlewares/UploadProfilePic");
 const uploadCloudinary = require("../../middlewares/cloudinarySetting");
+const accountModel=require("../../model/accountModel")
 
 router.post("/signup", Validation.checkEmail, Validation.checkPhoneNumber, async (req, res) => {
     const firstname = req.body.fname;
@@ -17,8 +18,13 @@ router.post("/signup", Validation.checkEmail, Validation.checkPhoneNumber, async
     const balance = req.body.balance;
     const user = new userModel({ firstname, lastname, email, phoneNumber, password, balance })
     try {
+        //creating the user
         const data = await user.save();
-        res.status(200).json(data);
+        //creating the account
+        const user_id=data._id;
+        const account=new accountModel({user:user_id,balance:0})
+        const accountData=account.save();
+        res.status(200).json({"message":"successfully saved user"});
     } catch (error) {
         res.status(400).json({ "message": error });
     }
