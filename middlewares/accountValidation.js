@@ -47,7 +47,7 @@ const validateSendMoney = async (req, res, next) => {
     const account = await accountModel.findOne({ user: accountuser._id });
     const newAmount = account.balance - amount;
     if (amount < 0) {
-        res.status(200).json({ "message": "amount to send can not be negative"});
+        res.status(200).json({ "message": "amount to send can not be negative" });
     }
     else if (amount > account.balance) {
         res.status(200).json({ "message": "not enough funds" });
@@ -55,28 +55,26 @@ const validateSendMoney = async (req, res, next) => {
     else if (amount == account.balance) {
         res.status(200).json({ "message": "you can not leave your balance to 0" })
     }
-    else if (phone ==req.body.phone)
-    {
+    else if (phone == req.body.phone) {
         res.status(200).json({ "message": "you cant send yourself money" })
     }
+
     else {
         req.amount = newAmount;
         next();
     }
 }
 
-const validateUserExistance=async(req,res,next)=>{
-    const phone=req.body.phone;
+const validateUserExistance = async (req, res, next) => {
+    const phone = req.body.phone;
     const accountuser = await userModel.findOne({ phoneNumber: phone });
-    if(accountuser==null)
-    {
-        res.status(200).json({"message":"receiver Phone Number doesnt exist"});
+    if (accountuser == null) {
+        res.status(200).json({ "message": "receiver Phone Number doesnt exist" });
     }
-    else
-    {
+    else {
         next();
     }
 }
 
 
-module.exports = { validateTopup, validateWithdrawal,validateSendMoney,validateUserExistance };
+module.exports = { validateTopup, validateWithdrawal, validateSendMoney, validateUserExistance };

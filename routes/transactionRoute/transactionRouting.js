@@ -48,4 +48,4 @@ router.post("/sendmoney", checkAuth, checkAccount.validateUserExistance, checkAc
 });
 
 
-module.exports=router;
+module.exports = router;
